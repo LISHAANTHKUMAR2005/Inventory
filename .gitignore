@@ -1,0 +1,32 @@
+# 1. Build files
+target/
+*.class
+*.jar
+*.war
+*.log
+
+# 2. IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# 3. OS-specific files
+.DS_Store
+Thumbs.db
+
+# 4. Environment/config files
+# Uncomment the properties/yml if they contain sensitive information
+# application.properties
+# application.yml
+.env
+
+# 5. Node modules (if frontend added later)
+node_modules/
+
+# 6. Logs and temp files
+logs/
+*.tmp
+*.swp
