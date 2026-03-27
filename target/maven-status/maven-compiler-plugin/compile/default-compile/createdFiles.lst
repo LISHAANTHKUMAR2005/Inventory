@@ -1,5 +1,6 @@
 com\inventory\exception\ResourceNotFoundException.class
 com\inventory\InventorySyncApplication.class
+com\inventory\model\InventoryAudit.class
 com\inventory\controller\InventoryUpdateRequest.class
 com\inventory\model\Inventory.class
 com\inventory\repository\InventoryRepository.class
@@ -7,6 +8,12 @@ com\inventory\exception\GlobalExceptionHandler.class
 com\inventory\service\InventoryService.class
 com\inventory\controller\ApiResponse$ApiResponseBuilder.class
 com\inventory\config\WebSocketConfig.class
+com\inventory\controller\DashboardController.class
+com\inventory\config\WebMvcConfig.class
 com\inventory\exception\InvalidInventoryException.class
+com\inventory\repository\InventoryAuditRepository.class
 com\inventory\controller\ApiResponse.class
+com\inventory\config\RateLimitInterceptor.class
+com\inventory\service\InventoryKafkaConsumer.class
 com\inventory\controller\InventoryController.class
+com\inventory\model\InventoryUpdateEvent.class

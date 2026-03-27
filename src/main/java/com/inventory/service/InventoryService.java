@@ -3,10 +3,15 @@ package com.inventory.service;
 import com.inventory.controller.InventoryUpdateRequest;
 import com.inventory.exception.InvalidInventoryException;
 import com.inventory.model.Inventory;
+import com.inventory.model.InventoryAudit;
+import com.inventory.repository.InventoryAuditRepository;
 import com.inventory.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.inventory.model.InventoryUpdateEvent;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +25,17 @@ import java.util.stream.Collectors;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final InventoryAuditRepository inventoryAuditRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    @Cacheable(value = "inventory", key = "#storeId")
     public List<Inventory> getInventoryByStore(Long storeId) {
         log.info("Fetching inventory for storeId: {}", storeId);
         return inventoryRepository.findByStoreId(storeId);
     }
 
     @Transactional
+    @CacheEvict(value = "inventory", key = "#storeId")
     public Inventory updateInventory(Long productId, Long storeId, int quantity) {
         if (quantity < 0) {
             throw new InvalidInventoryException("Quantity cannot be negative");
@@ -35,11 +43,13 @@ public class InventoryService {
 
         log.info("Updating inventory for productId: {}, storeId: {} to quantity: {}", productId, storeId, quantity);
 
+        int oldQuantity = 0;
         Optional<Inventory> existingOpt = inventoryRepository.findByProductIdAndStoreId(productId, storeId);
         Inventory inventory;
         
         if (existingOpt.isPresent()) {
             inventory = existingOpt.get();
+            oldQuantity = inventory.getQuantity();
             inventory.setQuantity(quantity);
         } else {
             inventory = new Inventory();
@@ -50,13 +60,20 @@ public class InventoryService {
         
         Inventory savedInventory = inventoryRepository.save(inventory);
         
-        // Broadcast real-time update string WebSocket
-        messagingTemplate.convertAndSend("/topic/inventory/" + storeId, savedInventory);
+        // Save Audit Log
+        InventoryAudit audit = new InventoryAudit();
+        audit.setInventoryId(savedInventory.getId());
+        audit.setOldQuantity(oldQuantity);
+        audit.setNewQuantity(savedInventory.getQuantity());
+        inventoryAuditRepository.save(audit);
+        
+        // Broadcast real-time update string WebSocket via Kafka
+        kafkaTemplate.send("inventory-updates", new InventoryUpdateEvent(savedInventory, "UPDATE"));
         
         // Low stock alert feature
         if (savedInventory.getQuantity() < 10) {
             log.warn("Low stock alert for productId: {} in storeId: {}. Current quantity: {}", productId, storeId, savedInventory.getQuantity());
-            messagingTemplate.convertAndSend("/topic/low-stock/" + storeId, savedInventory);
+            kafkaTemplate.send("inventory-updates", new InventoryUpdateEvent(savedInventory, "LOW_STOCK"));
         }
         
         return savedInventory;

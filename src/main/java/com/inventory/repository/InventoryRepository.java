@@ -13,6 +13,10 @@ import java.util.Optional;
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     List<Inventory> findByStoreId(Long storeId);
     
+    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Inventory> findByProductIdAndStoreId(Long productId, Long storeId);
+
+    List<Inventory> findByQuantityLessThan(int quantity);
+    List<Inventory> findTop10ByOrderByQuantityDesc();
 }
