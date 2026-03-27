@@ -8,234 +8,206 @@ I designed and developed the **Inventory Sync Microservice**, a core backend mod
 
 This service ensures **accurate, consistent, and real-time synchronization of inventory across multiple stores**, enabling seamless order processing and stock management.
 
-Additionally, I enhanced the system with **production-level features** such as caching, event-driven architecture, rate limiting, and audit logging.
+Additionally, I enhanced the system with production-level features such as caching, event-driven architecture, rate limiting, and audit logging.
 
 ---
 
-## 🎯 My Responsibilities
+# 📋 Requirement Specification
 
-* Designed and implemented a **real-time inventory management system**
-* Built REST APIs for inventory operations
-* Integrated **WebSocket for live updates**
-* Implemented **bulk inventory processing**
-* Ensured **data consistency using concurrency control**
-* Developed **low-stock alert mechanism**
-* Implemented **Redis caching for performance optimization**
-* Designed **Kafka-based event-driven communication**
-* Added **API rate limiting using Redis**
-* Implemented **audit logging for tracking inventory changes**
-* Developed **dashboard APIs for analytics**
-* Added **global exception handling and validation**
-* Structured the module following **microservice architecture principles**
+## ✅ Functional Requirements
+
+* Manage store-wise inventory
+* Add, update, and retrieve product stock
+* Support bulk inventory updates
+* Provide real-time stock updates
+* Trigger alerts for low stock
+* Maintain audit logs of inventory changes
+* Provide dashboard analytics
 
 ---
 
-## 🚀 Advanced Enhancements (Production-Level)
+## ⚙️ Non-Functional Requirements
+
+* High performance with real-time updates
+* Scalability using microservices
+* Reliability using transaction management
+* Security using validation and rate limiting
+* Availability of APIs for frontend integration
+
+---
+
+# 👥 User Stories
+
+### 🛒 Store Owner
+
+* As a store owner, I want to update product stock so that inventory is accurate
+* As a store owner, I want to update multiple products at once to save time
+
+### 👤 User
+
+* As a user, I want to see available products so that I can place orders
+* As a user, I want real-time stock updates to avoid ordering unavailable items
+
+### 🛠️ Admin
+
+* As an admin, I want to monitor low stock so that I can take action
+* As an admin, I want analytics of products so that I can make decisions
+
+---
+
+# 🎯 My Responsibilities
+
+* Designed and implemented real-time inventory system
+* Built REST APIs
+* Integrated WebSocket for live updates
+* Implemented Kafka event-driven flow
+* Added Redis caching and rate limiting
+* Developed audit logging system
+* Created dashboard APIs
+* Added exception handling and validation
+
+---
+
+# 🚀 Advanced Enhancements
 
 ### ⚡ Redis Caching
 
-* Integrated Redis for faster inventory retrieval
-* Used `@Cacheable` and `@CacheEvict` for optimized performance
-* Reduced database load significantly
+* Faster reads
+* Reduced DB load
 
----
+### 📡 Kafka Architecture
 
-### 📡 Kafka Event-Driven Architecture
+* Event-driven updates
+* Decoupled services
 
-* Implemented Kafka producer for inventory updates
-* Decoupled WebSocket communication from service layer
-* Kafka consumer broadcasts updates to:
+### 🚦 Rate Limiting
 
-  * `/topic/inventory/{storeId}`
-  * `/topic/low-stock/{storeId}`
-
----
-
-### 🚦 API Rate Limiting
-
-* Implemented using Redis (`StringRedisTemplate`)
-* Limited requests to **60 requests/min per IP**
-* Prevents abuse and ensures system stability
-
----
+* 60 requests/min per IP
 
 ### 📝 Audit Logging
 
-* Created `InventoryAudit` entity
-* Tracks:
-
-  * Old quantity
-  * New quantity
-  * Timestamp
-* Useful for monitoring and debugging
-
----
+* Tracks stock changes
 
 ### 📊 Dashboard APIs
 
-* `/api/inventory/dashboard/low-stock`
-* `/api/inventory/dashboard/top-products`
-* Provides analytics for decision-making
+* Low stock
+* Top products
 
 ---
 
-## ✨ Core Features Implemented
+# ✨ Core Features
 
-### 📦 Store-wise Inventory Management
-
-* Managed inventory for multiple stores
-* Supported product-level stock tracking
-* Enabled add/update/retrieve operations
-
----
-
-### ⚡ Real-Time Inventory Sync (Core Feature)
-
-* Implemented **WebSocket (STOMP protocol)** for live updates
-* Eliminated need for polling
-* Broadcast updates instantly to:
-
-  * `/topic/inventory/{storeId}`
+* Store-wise inventory
+* Real-time updates (WebSocket)
+* Low stock alerts
+* Bulk updates
+* Concurrency control
+* Exception handling
 
 ---
 
-### 🚨 Low Stock Alert System
+# 🔄 Process Flow
 
-* Automatically detects when stock < 10
-* Sends real-time alerts via:
-
-  * `/topic/low-stock/{storeId}`
-* Helps prevent stock-out scenarios
-
----
-
-### 🔁 Bulk Inventory Updates
-
-* Designed API for updating multiple products in one request
-* Improves performance for store-side operations
+1. User places order
+2. Order service checks inventory
+3. Inventory service validates stock
+4. Stock updated in database
+5. Kafka event published
+6. Consumer sends WebSocket update
+7. Clients receive real-time update
+8. Low stock alert triggered
 
 ---
 
-### 🔒 Concurrency Handling
+# ⚙️ Inventory Service Flow
 
-* Implemented **pessimistic locking**
-* Prevents race conditions and duplicate updates
-* Ensures data integrity under concurrent access
-
----
-
-### ⚠️ Exception Handling & Validation
-
-* Centralized error handling using `@ControllerAdvice`
-* Custom exceptions:
-
-  * InvalidInventoryException
-  * ResourceNotFoundException
-* Input validation:
-
-  * Prevent negative stock values
-  * Ensure valid product/store IDs
+1. Request → Controller
+2. Service → Business logic
+3. Repository → Database
+4. Update inventory
+5. Kafka event publish
+6. WebSocket broadcast
 
 ---
 
-### 📊 Standard API Response Format
+# 🏗️ System Design
 
-```json
-{
-  "status": "success",
-  "data": {},
-  "message": ""
-}
-```
+### Backend
 
----
+* Microservices architecture
+* REST + Kafka communication
+* WebSocket for real-time
+* Redis for caching
 
-## 🏗️ Architecture Design
+### Frontend
 
-This module follows a **layered microservice architecture**:
-
-* Controller Layer → Handles HTTP requests
-* Service Layer → Business logic & validations
-* Repository Layer → Database operations
-
-### 🔗 Integration Ready
-
-* Order Service → Stock deduction
-* Store Service → Inventory updates
-* Delivery Service → Availability checks
+* React apps (User, Store, Admin)
+* API + WebSocket integration
 
 ---
 
-## 🗄️ Database Design
+# 🏗️ Architecture
 
-### Inventory Table
+* Controller → Service → Repository
+* Stateless and scalable
+
+---
+
+# 🗄️ Database Design
 
 | Column     | Description        |
 | ---------- | ------------------ |
 | id         | Primary key        |
 | product_id | Product identifier |
 | store_id   | Store identifier   |
-| quantity   | Available stock    |
-| created_at | Created timestamp  |
-| updated_at | Updated timestamp  |
+| quantity   | Stock value        |
 
 ---
 
-## 📡 API Endpoints
-
-### Get Inventory
+# 📡 API Endpoints
 
 GET /api/inventory/{storeId}
-
-### Update Inventory
-
 PUT /api/inventory/update
-
-### Bulk Update
-
 POST /api/inventory/bulk-update
 
-### Dashboard APIs
+---
 
-GET /api/inventory/dashboard/low-stock
-GET /api/inventory/dashboard/top-products
+# ⚡ Real-Time Channels
+
+* /topic/inventory/{storeId}
+* /topic/low-stock/{storeId}
 
 ---
 
-## ⚡ Real-Time Channels
+# 🛠️ Tech Stack
 
-| Feature           | WebSocket Topic              |
-| ----------------- | ---------------------------- |
-| Inventory Updates | `/topic/inventory/{storeId}` |
-| Low Stock Alerts  | `/topic/low-stock/{storeId}` |
-
----
-
-## 🛠️ Tech Stack Used
-
-* Java 17
-* Spring Boot
-* Spring Data JPA
+* Java, Spring Boot
 * MySQL
-* WebSocket (STOMP)
+* WebSocket
 * Redis
-* Apache Kafka
-* Lombok
-* Maven
+* Kafka
 
 ---
 
-## 🔐 Security & Data Protection
+# 🔐 Security
 
-* Input validation for all requests
-* Prevention of invalid stock updates
-* API rate limiting
-* Data consistency using transactions
-* Designed for JWT authentication integration
+* Input validation
+* Rate limiting
+* Transaction safety
 
 ---
 
-## ⚙️ How to Run
+# 📊 Evaluation Mapping
+
+* Architecture → Microservices + Kafka
+* Security → Validation + Rate limit
+* Exception → Global handler
+* Performance → WebSocket + Redis
+* Prototype → Working APIs
+
+---
+
+# ⚙️ Setup
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/Inventory.git
@@ -245,61 +217,45 @@ mvn spring-boot:run
 
 ---
 
-## ⚠️ Important Setup
+# ⚠️ Requirements
 
-To use advanced features:
-
-* Redis must be running on port **6379**
-* Kafka must be running on port **9092**
-
-If not available, core APIs will still function.
+* Redis (6379)
+* Kafka (9092)
 
 ---
 
-## 🎬 Demo Flow
+# 🎬 Demo
 
-1. Update inventory via API
-2. Observe real-time updates via WebSocket
-3. Trigger low-stock alert
-4. Perform bulk update
-5. Show dashboard analytics
+* Update inventory
+* Show real-time updates
+* Trigger alerts
 
 ---
 
-## 📈 Performance Highlights
+# 📈 Performance
 
-* Real-time updates (no polling)
-* Redis caching for fast reads
-* Kafka for scalable event processing
-* Rate limiting for stability
-* Optimized database queries
+* Real-time (no polling)
+* Fast reads (Redis)
+* Async processing (Kafka)
 
 ---
 
-## 🔮 Future Enhancements
+# 🔮 Future Work
 
-* JWT-based authentication
-* Role-based access control
-* React-based admin dashboard
-* AI-based demand prediction
+* JWT security
+* Admin dashboard
+* AI prediction
 
 ---
 
-## 🏆 Conclusion
+# 🏆 Conclusion
 
-This module delivers a **scalable, high-performance, and real-time inventory management system** enhanced with modern backend technologies like Redis and Kafka.
-
-It ensures:
-
-* Data consistency
-* High performance
-* Real-time synchronization
-* Reliability under concurrent usage
+A scalable, real-time inventory system using modern backend technologies.
 
 ---
 
 ## 👨‍💻 Author
 
-**Your Name**
-Inventory Sync Module Developer
-HCL Hackathon Project
+Your Name
+Inventory Sync Developer
+HCL Hackathon
