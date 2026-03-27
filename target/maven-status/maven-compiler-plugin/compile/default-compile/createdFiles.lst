@@ -1,0 +1,12 @@
+com\inventory\exception\ResourceNotFoundException.class
+com\inventory\InventorySyncApplication.class
+com\inventory\controller\InventoryUpdateRequest.class
+com\inventory\model\Inventory.class
+com\inventory\repository\InventoryRepository.class
+com\inventory\exception\GlobalExceptionHandler.class
+com\inventory\service\InventoryService.class
+com\inventory\controller\ApiResponse$ApiResponseBuilder.class
+com\inventory\config\WebSocketConfig.class
+com\inventory\exception\InvalidInventoryException.class
+com\inventory\controller\ApiResponse.class
+com\inventory\controller\InventoryController.class
